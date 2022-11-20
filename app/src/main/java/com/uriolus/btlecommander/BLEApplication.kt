@@ -2,11 +2,12 @@ package com.uriolus.btlecommander
 
 import android.app.Application
 import com.uriolus.btlecommander.di.featureModule
+import com.uriolus.btlelib.di.btlelibModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 
-class BLEApplication:Application() {
+class BLEApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
@@ -16,7 +17,7 @@ class BLEApplication:Application() {
             // Reference Android context
             androidContext(this@BLEApplication)
             // Load modules
-            modules(featureModule)
+            modules(featureModule, btlelibModule)
         }
     }
 }

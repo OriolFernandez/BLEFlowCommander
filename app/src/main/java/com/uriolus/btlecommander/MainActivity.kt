@@ -22,7 +22,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModel<MainViewModel>()
-    val permissionsNeeded = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    private val permissionsNeeded = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         arrayOf(
             android.Manifest.permission.BLUETOOTH_CONNECT,
             android.Manifest.permission.BLUETOOTH_SCAN
@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         { permissions ->
             // Handle Permission granted/rejected
             permissions.entries.forEach {
-                val permissionName = it.key
+                //val permissionName = it.key
                 val isGranted = it.value
                 if (isGranted) {
                     // Permission is granted
@@ -64,13 +64,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun MainScreen(viewModel: MainViewModel) {
-    val scanStatus: ScanStatus by remember(viewModel) { viewModel.scanStatus }.collectAsState()
+    val scanStatus: PresentationScanStatus by remember(viewModel) { viewModel.scanStatus }.collectAsState()
     BTLECommanderTheme {
         // A surface container using the 'background' color from the theme
         when (scanStatus) {
-            ScanStatus.Idle -> UiForScannedStatus() { viewModel.scan() }
-            is ScanStatus.Scanned -> UIForIddle()
-            ScanStatus.Scanning -> UIForScanning()
+            PresentationScanStatus.Idle -> UiForScannedStatus() { viewModel.scan() }
+            is PresentationScanStatus.Scanned -> UIForIddle()
+            PresentationScanStatus.Scanning -> UIForScanning()
+            is PresentationScanStatus.Error -> TODO()
         }
 
     }
