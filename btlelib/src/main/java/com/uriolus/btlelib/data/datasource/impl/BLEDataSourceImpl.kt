@@ -13,57 +13,84 @@ import android.os.Looper
 import android.util.Log
 import com.uriolus.btlelib.BLEDevice
 import com.uriolus.btlelib.data.datasource.BLEDataSource
-import com.uriolus.btlelib.data.datasource.mapping.toDonmain
+import com.uriolus.btlelib.data.datasource.mapping.toBLEDevice
+import com.uriolus.btlelib.domain.ScanError
 import com.uriolus.btlelib.domain.ScanStatus
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 
-private const val SCAN_TIMEOUT = 30000L
+private const val SCAN_TIMEOUT = 10000L
 
 @SuppressLint("MissingPermission")
 class BLEDataSourceImpl(context: Application) : BLEDataSource {
 
-    private val _stateFlow: MutableStateFlow<ScanStatus> = MutableStateFlow(ScanStatus.Stopped)
-    val statusFlow: StateFlow<ScanStatus>
-        get() = _stateFlow
-
-    private var isScanning = false
-    private val timeOutHandler = Handler(Looper.getMainLooper())
-    private val bluetoothAdapter: BluetoothAdapter by lazy {
+    private val _scanStatusFlow: MutableStateFlow<ScanStatus> = MutableStateFlow(ScanStatus.Stopped)
+    private val bluetoothAdapter: BluetoothAdapter? by lazy {
         val bluetoothManager =
             context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothManager.adapter
     }
+    private val bleScanner by lazy {
+        bluetoothAdapter?.bluetoothLeScanner
+    }
+    private val devices: MutableSet<BLEDevice> = mutableSetOf()
+    private var isScanning = false
+    private val timeOutHandler = Handler(Looper.getMainLooper())
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            with(result.device) {
-                _stateFlow.value = ScanStatus.DeviceFound(toDonmain())
+            with(result) {
+                devices.add(toBLEDevice())
+                _scanStatusFlow.value = ScanStatus.Scanning(devices.toList())
                 Log.d(
                     "ScanCallback",
-                    "Found BLE device! Name: ${name ?: "Unnamed"}, address: $address"
+                    "Found BLE device! Name: ${result.device.name ?: "Unnamed"}, address: ${result.device.address}"
                 )
             }
         }
-    }
-    private val bleScanner by lazy {
-        bluetoothAdapter.bluetoothLeScanner
+
+        override fun onBatchScanResults(results: MutableList<ScanResult>?) {
+            Log.d("ScanCallback", " No idea what is this results: $results")
+        }
+
+        override fun onScanFailed(errorCode: Int) {
+            Log.e("ScanCallback", "onScanFailed: code $errorCode")
+        }
     }
 
     private val scanSettings = ScanSettings.Builder()
         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
         .build()
 
-    override fun startScan(): StateFlow<ScanStatus>{
-        bleScanner.startScan(null, scanSettings, scanCallback)
-        setScanTimeOut()
-        isScanning = true
-       return _stateFlow
+    override fun connectToScanStatus(): StateFlow<ScanStatus> {
+        return _scanStatusFlow
+    }
+
+    override fun startScan() {
+        if (bluetoothAdapter.isAvailable()) {
+            bleScanner?.startScan(null, scanSettings, scanCallback)
+            setScanTimeOut()
+            isScanning = true
+        } else {
+            _scanStatusFlow.value = ScanStatus.Error(ScanError.BluetoothNotAvailable)
+        }
     }
 
     override fun stopScan() {
-        bleScanner.stopScan(scanCallback)
+        timeOutHandler.removeCallbacksAndMessages(null)
+        if (bluetoothAdapter.isAvailable()) {
+            try {
+                bleScanner?.stopScan(scanCallback)
+                _scanStatusFlow.value = ScanStatus.Stopped // TODO not sure this should be here
+            } catch (e: IllegalStateException) {
+                _scanStatusFlow.value = ScanStatus.Error(ScanError.IllegalState)
+            }
+        } else {
+            _scanStatusFlow.value = ScanStatus.Error(ScanError.BluetoothNotAvailable)
+        }
     }
+
+    private fun BluetoothAdapter?.isAvailable(): Boolean =
+        this?.isEnabled ?: false
 
     private fun setScanTimeOut() {
         if (isScanning) {

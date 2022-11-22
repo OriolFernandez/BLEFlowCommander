@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -16,7 +17,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.uriolus.btlecommander.ui.theme.BTLECommanderTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -67,46 +70,58 @@ private fun MainScreen(viewModel: MainViewModel) {
     val scanStatus: PresentationScanStatus by remember(viewModel) { viewModel.scanStatus }.collectAsState()
     BTLECommanderTheme {
         // A surface container using the 'background' color from the theme
-        when (scanStatus) {
-            PresentationScanStatus.Idle -> UiForScannedStatus() { viewModel.scan() }
-            is PresentationScanStatus.Scanned -> UIForIddle()
-            PresentationScanStatus.Scanning -> UIForScanning()
-            is PresentationScanStatus.Error -> TODO()
+        when (val status = scanStatus) {// this allows the smart cast to work with a delegate val as scanStatus
+            PresentationScanStatus.Idle -> UiForScannedStatus() { viewModel.startScan() }
+            is PresentationScanStatus.Scanned -> UIForIdle() { viewModel.startScan() }
+            PresentationScanStatus.Scanning -> UIForScanning { viewModel.stopScan() }
+            is PresentationScanStatus.Error -> UIForError(status)
         }
-
     }
 }
 
 @Composable
-fun UIForScanning() {
+fun UIForScanning(onStop: () -> Unit) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primary) {
-        Text("Loading")
+        Column(Modifier.padding(20.dp)) {
+            Text(text = "Scanning")
+            Button(onClick = {
+                onStop()
+            }) {
+                Text(text = "Stop Scanner")
+            }
+        }
     }
 }
 
 @Composable
-fun UIForIddle() {
+fun UIForIdle(onScan: () -> Unit) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primary) {
-        Text("Waiting")
+        ReadyToScan { onScan() }
+    }
+}
+
+@Composable
+fun UIForError(scanStatus: PresentationScanStatus.Error) {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primary) {
+        Text("Error: ${scanStatus.error.scanError}")
     }
 }
 
 @Composable
 fun UiForScannedStatus(onScan: () -> Unit) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-        Greeting("Android") { onScan() }
+        ReadyToScan { onScan() }
     }
 }
 
 @Composable
-fun Greeting(name: String, onScan: () -> Unit) {
-    Column() {
-        Text(text = "Hello $name!")
+fun ReadyToScan(onScan: () -> Unit) {
+    Column(Modifier.padding(20.dp)) {
+        Text(text = "Scan", color = Color.White)
         Button(onClick = {
-            println("Click")
             onScan()
         }) {
-
+            Text(text = "Start scan", color = Color.White)
         }
     }
 }
@@ -115,6 +130,6 @@ fun Greeting(name: String, onScan: () -> Unit) {
 @Composable
 fun DefaultPreview() {
     BTLECommanderTheme {
-        Greeting("Android", { })
+        ReadyToScan { }
     }
 }
