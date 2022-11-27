@@ -12,7 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.uriolus.btlelib.BLEDevice
-import com.uriolus.btlelib.data.datasource.BLEDataSource
+import com.uriolus.btlelib.data.datasource.BLEScanDataSource
 import com.uriolus.btlelib.data.datasource.mapping.toBLEDevice
 import com.uriolus.btlelib.domain.ScanError
 import com.uriolus.btlelib.domain.ScanStatus
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.*
 private const val SCAN_TIMEOUT = 10000L
 
 @SuppressLint("MissingPermission")
-class BLEDataSourceImpl(context: Application) : BLEDataSource {
+class BLEScanScanDataSourceImpl(context: Application) : BLEScanDataSource {
 
     private val _scanStatusFlow: MutableStateFlow<ScanStatus> = MutableStateFlow(ScanStatus.Stopped)
     private val bluetoothAdapter: BluetoothAdapter? by lazy {
@@ -40,7 +40,7 @@ class BLEDataSourceImpl(context: Application) : BLEDataSource {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             with(result) {
                 devices.add(toBLEDevice())
-                _scanStatusFlow.value = ScanStatus.Scanning(devices.toList())
+                _scanStatusFlow.update { ScanStatus.Scanning(devices.toList()) }
                 Log.d(
                     "ScanCallback",
                     "Found BLE device! Name: ${result.device.name ?: "Unnamed"}, address: ${result.device.address}"
@@ -62,7 +62,7 @@ class BLEDataSourceImpl(context: Application) : BLEDataSource {
         .build()
 
     override fun connectToScanStatus(): StateFlow<ScanStatus> {
-        return _scanStatusFlow
+        return _scanStatusFlow.asStateFlow()
     }
 
     override fun startScan() {

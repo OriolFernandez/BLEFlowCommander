@@ -70,7 +70,8 @@ private fun MainScreen(viewModel: MainViewModel) {
     val scanStatus: PresentationScanStatus by remember(viewModel) { viewModel.scanStatus }.collectAsState()
     BTLECommanderTheme {
         // A surface container using the 'background' color from the theme
-        when (val status = scanStatus) {// this allows the smart cast to work with a delegate val as scanStatus
+        when (val status =
+            scanStatus) {// this allows the smart cast to work with a delegate val as scanStatus
             PresentationScanStatus.Idle -> UiForScannedStatus() { viewModel.startScan() }
             is PresentationScanStatus.Scanned -> UIForIdle() { viewModel.startScan() }
             PresentationScanStatus.Scanning -> UIForScanning { viewModel.stopScan() }
