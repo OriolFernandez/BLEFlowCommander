@@ -1,4 +1,4 @@
-package com.uriolus.btlelib.domain
+package com.uriolus.btlelib.scan.domain
 
 sealed class ScanError {
     object BluetoothNotAvailable : ScanError()

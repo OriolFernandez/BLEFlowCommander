@@ -1,9 +1,8 @@
-package com.uriolus.btlelib.data.datasource.mapping
+package com.uriolus.btlelib.scan.data.datasource.mapping
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
-import com.uriolus.btlelib.BLEDevice
+import com.uriolus.btlelib.common.domain.BLEDevice
 
 @SuppressLint("MissingPermission")
 fun ScanResult.toBLEDevice(): BLEDevice {

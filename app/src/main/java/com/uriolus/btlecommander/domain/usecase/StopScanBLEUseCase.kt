@@ -1,10 +1,8 @@
 package com.uriolus.btlecommander.domain.usecase
 
-import com.uriolus.btlelib.data.repository.BLERepository
-import com.uriolus.btlelib.domain.ScanStatus
-import kotlinx.coroutines.flow.StateFlow
+import com.uriolus.btlelib.scan.repository.BLEScanRepository
 
-class StopScanBLEUseCase(private val repository:BLERepository) {
+class StopScanBLEUseCase(private val repository: BLEScanRepository) {
      fun exec() {
         return repository.stopScan()
     }

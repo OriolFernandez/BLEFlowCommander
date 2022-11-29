@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.concurrent.atomic.AtomicInteger
 
-
 class BluetoothStateMonitorAndroid(private val context: Context) : BluetoothStateMonitor {
     private val _bluetoothStateFlow = MutableStateFlow<BluetoothState>(BluetoothState.Unknown)
     private var subscribersCount = AtomicInteger(0)

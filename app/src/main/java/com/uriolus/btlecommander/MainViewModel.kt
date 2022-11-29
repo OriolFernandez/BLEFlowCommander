@@ -3,12 +3,13 @@ package com.uriolus.btlecommander
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.uriolus.btlecommander.domain.usecase.*
-import com.uriolus.btlelib.BLEDevice
+import com.uriolus.btlecommander.scanneddevices.BLEDevicePresentation
+import com.uriolus.btlelib.common.domain.BLEDevice
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
-import com.uriolus.btlelib.domain.ScanStatus
+import com.uriolus.btlelib.scan.domain.ScanStatus
 import com.uriolus.btlelib.statemonitor.domain.BluetoothState
 
 
@@ -17,7 +18,8 @@ class MainViewModel(
     private val startScanBLEUseCase: StartScanBLEUseCase,
     private val stopScanBLEUseCase: StopScanBLEUseCase,
     private val registerToBluetoothStateUseCase: RegisterToBluetoothStateUseCase,
-    private val unregisterToBluetoothStateUseCase: UnregisterToBluetoothStateUseCase
+    private val unregisterToBluetoothStateUseCase: UnregisterToBluetoothStateUseCase,
+    private val connectToBLEDeviceUseCase: ConnectToBLEDeviceUseCase
 ) : ViewModel() {
     private val _scanStatus = MutableStateFlow<PresentationScanStatus>(PresentationScanStatus.Idle)
     val scanStatus: StateFlow<PresentationScanStatus>
@@ -30,11 +32,11 @@ class MainViewModel(
 
     private fun subscribeToBluetoothState() {
         viewModelScope.launch {
-            registerToBluetoothStateUseCase.exec().collect {bluetoothState->
-                when(bluetoothState){
+            registerToBluetoothStateUseCase.exec().collect { bluetoothState ->
+                when (bluetoothState) {
                     BluetoothState.Connected -> println("Bluetooth connected")
-                    BluetoothState.Disconnected ->  println("Bluetooth disconnected")
-                    BluetoothState.Unknown ->  println("Bluetooth state unknown")
+                    BluetoothState.Disconnected -> println("Bluetooth disconnected")
+                    BluetoothState.Unknown -> println("Bluetooth state unknown")
                 }
             }
         }
@@ -51,12 +53,13 @@ class MainViewModel(
                     println("NEW STATE $it")
                     when (it) {
                         is ScanStatus.Scanning -> {
+                            devicesFound.clear()
                             devicesFound.addAll(it.devices)
-                            _scanStatus.value = PresentationScanStatus.Scanning
+                            _scanStatus.value = PresentationScanStatus.Scanning(it.devices)
                         }
                         is ScanStatus.Error -> _scanStatus.value = PresentationScanStatus.Error(it)
                         is ScanStatus.ScanFinished -> _scanStatus.value =
-                            PresentationScanStatus.Idle
+                            PresentationScanStatus.Scanned(devicesFound)
                         is ScanStatus.Stopped -> _scanStatus.value = PresentationScanStatus.Idle
                     }
                 }
@@ -74,11 +77,17 @@ class MainViewModel(
             stopScanBLEUseCase.exec()
         }
     }
+
+    fun onDeviceClick(it: BLEDevicePresentation) {
+        println("Device clicked $it")
+        // connectToScanBLEUseCase.exec()
+
+    }
 }
 
 sealed class PresentationScanStatus {
     object Idle : PresentationScanStatus()
-    object Scanning : PresentationScanStatus()
+    data class Scanning(val devices: List<BLEDevice>) : PresentationScanStatus()
     data class Scanned(val devices: List<BLEDevice>) : PresentationScanStatus()
     data class Error(val error: ScanStatus.Error) : PresentationScanStatus()
 }

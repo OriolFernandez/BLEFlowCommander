@@ -12,7 +12,8 @@ val featureModule = module {
             StartScanBLEUseCase(get()),
             StopScanBLEUseCase(get()),
             RegisterToBluetoothStateUseCase(get()),
-            UnregisterToBluetoothStateUseCase(get())
+            UnregisterToBluetoothStateUseCase(get()),
+            ConnectToBLEDeviceUseCase(get())
         )
     }
 }

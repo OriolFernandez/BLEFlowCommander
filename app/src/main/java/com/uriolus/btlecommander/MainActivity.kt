@@ -20,6 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.uriolus.btlecommander.scanneddevices.BLEDevicePresentation
+import com.uriolus.btlecommander.scanneddevices.DevicesList
+import com.uriolus.btlecommander.scanneddevices.mapper.Mapper.toPresentation
 import com.uriolus.btlecommander.ui.theme.BTLECommanderTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -73,15 +76,33 @@ private fun MainScreen(viewModel: MainViewModel) {
         when (val status =
             scanStatus) {// this allows the smart cast to work with a delegate val as scanStatus
             PresentationScanStatus.Idle -> UiForScannedStatus() { viewModel.startScan() }
-            is PresentationScanStatus.Scanned -> UIForIdle() { viewModel.startScan() }
-            PresentationScanStatus.Scanning -> UIForScanning { viewModel.stopScan() }
+            is PresentationScanStatus.Scanned -> UIForScannedResults(status.devices.map { it.toPresentation() }) { viewModel.onDeviceClick(it) }
+            is PresentationScanStatus.Scanning -> UIForScanning(status.devices.map { it.toPresentation() },
+                { viewModel.stopScan() }) {
+                viewModel.onDeviceClick(it)
+            }
             is PresentationScanStatus.Error -> UIForError(status)
         }
     }
 }
 
 @Composable
-fun UIForScanning(onStop: () -> Unit) {
+fun UIForScannedResults(
+    devices: List<BLEDevicePresentation>,
+    onClick: (BLEDevicePresentation) -> Unit
+) {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.secondary) {
+        DevicesList(devices = devices, onClick)
+    }
+}
+
+
+@Composable
+fun UIForScanning(
+    devices: List<BLEDevicePresentation>,
+    onStop: () -> Unit,
+    onClick: (BLEDevicePresentation) -> Unit
+) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primary) {
         Column(Modifier.padding(20.dp)) {
             Text(text = "Scanning")
@@ -90,6 +111,7 @@ fun UIForScanning(onStop: () -> Unit) {
             }) {
                 Text(text = "Stop Scanner")
             }
+            DevicesList(devices = devices, onClick)
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.uriolus.btlelib.data.datasource.impl
+package com.uriolus.btlelib.scan.data.datasource.impl
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -11,17 +11,21 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.uriolus.btlelib.BLEDevice
-import com.uriolus.btlelib.data.datasource.BLEScanDataSource
-import com.uriolus.btlelib.data.datasource.mapping.toBLEDevice
-import com.uriolus.btlelib.domain.ScanError
-import com.uriolus.btlelib.domain.ScanStatus
+import com.uriolus.btlelib.common.BLEDevicesCache
+import com.uriolus.btlelib.common.domain.BLEDevice
+import com.uriolus.btlelib.scan.data.datasource.BLEScanDataSource
+import com.uriolus.btlelib.scan.data.datasource.mapping.toBLEDevice
+import com.uriolus.btlelib.scan.domain.ScanError
+import com.uriolus.btlelib.scan.domain.ScanStatus
 import kotlinx.coroutines.flow.*
 
 private const val SCAN_TIMEOUT = 10000L
 
 @SuppressLint("MissingPermission")
-class BLEScanScanDataSourceImpl(context: Application) : BLEScanDataSource {
+class BLEScanScanDataSourceImpl(
+    context: Application,
+    private val bleDevicesCache: BLEDevicesCache
+) : BLEScanDataSource {
 
     private val _scanStatusFlow: MutableStateFlow<ScanStatus> = MutableStateFlow(ScanStatus.Stopped)
     private val bluetoothAdapter: BluetoothAdapter? by lazy {
@@ -38,14 +42,13 @@ class BLEScanScanDataSourceImpl(context: Application) : BLEScanDataSource {
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            with(result) {
-                devices.add(toBLEDevice())
-                _scanStatusFlow.update { ScanStatus.Scanning(devices.toList()) }
-                Log.d(
-                    "ScanCallback",
-                    "Found BLE device! Name: ${result.device.name ?: "Unnamed"}, address: ${result.device.address}"
-                )
-            }
+            bleDevicesCache.storeBluetoothDevice(result.device)
+            devices.add(result.toBLEDevice())
+            _scanStatusFlow.update { ScanStatus.Scanning(devices.toList()) }
+            Log.d(
+                "ScanCallback",
+                "Found BLE device! Name: ${result.device.name ?: "Unnamed"}, address: ${result.device.address}"
+            )
         }
 
         override fun onBatchScanResults(results: MutableList<ScanResult>?) {
@@ -80,7 +83,7 @@ class BLEScanScanDataSourceImpl(context: Application) : BLEScanDataSource {
         if (bluetoothAdapter.isAvailable()) {
             try {
                 bleScanner?.stopScan(scanCallback)
-                _scanStatusFlow.value = ScanStatus.Stopped // TODO not sure this should be here
+                _scanStatusFlow.value = ScanStatus.ScanFinished
             } catch (e: IllegalStateException) {
                 _scanStatusFlow.value = ScanStatus.Error(ScanError.IllegalState)
             }
