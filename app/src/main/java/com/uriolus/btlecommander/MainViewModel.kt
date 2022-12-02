@@ -52,15 +52,16 @@ class MainViewModel(
                 .collect {
                     println("NEW STATE $it")
                     when (it) {
-                        is ScanStatus.Scanning -> {
+                        is ScanStatus.ScanningDeviceFound -> {
                             devicesFound.clear()
                             devicesFound.addAll(it.devices)
-                            _scanStatus.value = PresentationScanStatus.Scanning(it.devices)
+                            _scanStatus.value = PresentationScanStatus.ScanningDeviceFound(it.devices)
                         }
                         is ScanStatus.Error -> _scanStatus.value = PresentationScanStatus.Error(it)
                         is ScanStatus.ScanFinished -> _scanStatus.value =
                             PresentationScanStatus.Scanned(devicesFound)
                         is ScanStatus.Stopped -> _scanStatus.value = PresentationScanStatus.Idle
+                        ScanStatus.ScanningStarted -> _scanStatus.value = PresentationScanStatus.Scanning
                     }
                 }
         }
@@ -81,13 +82,23 @@ class MainViewModel(
     fun onDeviceClick(it: BLEDevicePresentation) {
         println("Device clicked $it")
         // connectToScanBLEUseCase.exec()
-
+        viewModelScope.launch {
+            connectToBLEDeviceUseCase.exec(it)
+                .fold({
+                    println("error $it")
+                    println("Thread ${Thread.currentThread()}")
+                },{
+                    println("Connected")
+                    println("Thread ${Thread.currentThread()}")
+                })
+        }
     }
 }
 
 sealed class PresentationScanStatus {
     object Idle : PresentationScanStatus()
-    data class Scanning(val devices: List<BLEDevice>) : PresentationScanStatus()
+    object  Scanning:PresentationScanStatus()
+    data class ScanningDeviceFound(val devices: List<BLEDevice>) : PresentationScanStatus()
     data class Scanned(val devices: List<BLEDevice>) : PresentationScanStatus()
     data class Error(val error: ScanStatus.Error) : PresentationScanStatus()
 }

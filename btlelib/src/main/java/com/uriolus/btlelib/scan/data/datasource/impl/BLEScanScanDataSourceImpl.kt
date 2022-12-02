@@ -44,7 +44,7 @@ class BLEScanScanDataSourceImpl(
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             bleDevicesCache.storeBluetoothDevice(result.device)
             devices.add(result.toBLEDevice())
-            _scanStatusFlow.update { ScanStatus.Scanning(devices.toList()) }
+            _scanStatusFlow.update { ScanStatus.ScanningDeviceFound(devices.toList()) }
             Log.d(
                 "ScanCallback",
                 "Found BLE device! Name: ${result.device.name ?: "Unnamed"}, address: ${result.device.address}"
@@ -71,6 +71,7 @@ class BLEScanScanDataSourceImpl(
     override fun startScan() {
         if (bluetoothAdapter.isAvailable()) {
             bleScanner?.startScan(null, scanSettings, scanCallback)
+            _scanStatusFlow.value = ScanStatus.ScanningStarted
             setScanTimeOut()
             isScanning = true
         } else {

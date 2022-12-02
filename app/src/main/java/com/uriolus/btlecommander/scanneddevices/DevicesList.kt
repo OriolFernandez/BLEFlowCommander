@@ -16,8 +16,6 @@ fun DevicesList(
     devices: List<BLEDevicePresentation>,
     onItemClick: (BLEDevicePresentation) -> Unit
 ) {
-    var selectedIndex by remember { mutableStateOf(0) }
-    val onItemClick = { index: Int -> selectedIndex = index }
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)

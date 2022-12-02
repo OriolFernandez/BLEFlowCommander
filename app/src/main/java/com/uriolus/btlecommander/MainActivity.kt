@@ -76,12 +76,22 @@ private fun MainScreen(viewModel: MainViewModel) {
         when (val status =
             scanStatus) {// this allows the smart cast to work with a delegate val as scanStatus
             PresentationScanStatus.Idle -> UiForScannedStatus() { viewModel.startScan() }
-            is PresentationScanStatus.Scanned -> UIForScannedResults(status.devices.map { it.toPresentation() }) { viewModel.onDeviceClick(it) }
-            is PresentationScanStatus.Scanning -> UIForScanning(status.devices.map { it.toPresentation() },
-                { viewModel.stopScan() }) {
+            is PresentationScanStatus.Scanned -> UIForScannedResults(status.devices.map { it.toPresentation() }) {
+                viewModel.onDeviceClick(
+                    it
+                )
+            }
+            is PresentationScanStatus.ScanningDeviceFound -> UIForScanning(status.devices.map { it.toPresentation() },
+                { viewModel.stopScan() }
+            ) {
                 viewModel.onDeviceClick(it)
             }
             is PresentationScanStatus.Error -> UIForError(status)
+            PresentationScanStatus.Scanning -> UIForScanning(
+                devices = emptyList(),
+                onStop = { viewModel.stopScan() },
+                onClick = {}
+            )
         }
     }
 }

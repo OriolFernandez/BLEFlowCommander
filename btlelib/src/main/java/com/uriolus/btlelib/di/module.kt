@@ -14,7 +14,7 @@ import com.uriolus.btlelib.statemonitor.service.BluetoothStateMonitorAndroid
 import org.koin.dsl.module
 
 val btleLibModule = module {
-    single<BLEDevicesCache> {
+    single{
         BLEDevicesCache()
     }
     single<BLEScanDataSource> {
