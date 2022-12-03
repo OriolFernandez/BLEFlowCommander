@@ -55,13 +55,15 @@ class MainViewModel(
                         is ScanStatus.ScanningDeviceFound -> {
                             devicesFound.clear()
                             devicesFound.addAll(it.devices)
-                            _scanStatus.value = PresentationScanStatus.ScanningDeviceFound(it.devices)
+                            _scanStatus.value =
+                                PresentationScanStatus.ScanningDeviceFound(it.devices)
                         }
                         is ScanStatus.Error -> _scanStatus.value = PresentationScanStatus.Error(it)
                         is ScanStatus.ScanFinished -> _scanStatus.value =
                             PresentationScanStatus.Scanned(devicesFound)
                         is ScanStatus.Stopped -> _scanStatus.value = PresentationScanStatus.Idle
-                        ScanStatus.ScanningStarted -> _scanStatus.value = PresentationScanStatus.Scanning
+                        ScanStatus.ScanningStarted -> _scanStatus.value =
+                            PresentationScanStatus.Scanning
                     }
                 }
         }
@@ -81,23 +83,25 @@ class MainViewModel(
 
     fun onDeviceClick(it: BLEDevicePresentation) {
         println("Device clicked $it")
-        // connectToScanBLEUseCase.exec()
         viewModelScope.launch {
-            connectToBLEDeviceUseCase.exec(it)
+            connectToBLEDeviceUseCase.exec(it.toDomain())
                 .fold({
                     println("error $it")
                     println("Thread ${Thread.currentThread()}")
-                },{
+                }, {
                     println("Connected")
                     println("Thread ${Thread.currentThread()}")
                 })
         }
     }
+
+    private fun BLEDevicePresentation.toDomain(): BLEDevice =
+        BLEDevice(this.name, this.mac, this.rssi)
 }
 
 sealed class PresentationScanStatus {
     object Idle : PresentationScanStatus()
-    object  Scanning:PresentationScanStatus()
+    object Scanning : PresentationScanStatus()
     data class ScanningDeviceFound(val devices: List<BLEDevice>) : PresentationScanStatus()
     data class Scanned(val devices: List<BLEDevice>) : PresentationScanStatus()
     data class Error(val error: ScanStatus.Error) : PresentationScanStatus()

@@ -7,9 +7,6 @@ import com.uriolus.btlelib.connect.domain.ConnectBLEDeviceError
 import com.uriolus.btlelib.connect.repository.BLEConnectRepository
 
 class ConnectToBLEDeviceUseCase(private val repository: BLEConnectRepository) {
-    suspend fun exec(device: BLEDevicePresentation): Either<ConnectBLEDeviceError, Unit> =
-        repository.connect(device.toDomain())
+    suspend fun exec(device: BLEDevice): Either<ConnectBLEDeviceError, Unit> =
+        repository.connect(device)
 }
-
-fun BLEDevicePresentation.toDomain(): BLEDevice =
-    BLEDevice(this.name, this.mac, this.rssi)
