@@ -20,14 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.uriolus.btlecommander.scanneddevices.BLEDevicePresentation
 import com.uriolus.btlecommander.scanneddevices.DevicesList
 import com.uriolus.btlecommander.scanneddevices.mapper.Mapper.toPresentation
 import com.uriolus.btlecommander.ui.theme.BTLECommanderTheme
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
-    private val viewModel by viewModel<MainViewModel>()
     private val permissionsNeeded = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         arrayOf(
             android.Manifest.permission.BLUETOOTH_CONNECT,
@@ -59,7 +58,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         checkPermissions()
         setContent {
-            MainScreen(viewModel)
+            MainScreen()
         }
     }
 
@@ -69,7 +68,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun MainScreen(viewModel: MainViewModel) {
+fun MainScreen(viewModel: MainViewModel = viewModel()) {
+
     val scanStatus: PresentationScanStatus by remember(viewModel) { viewModel.scanStatus }.collectAsState()
     BTLECommanderTheme {
         // A surface container using the 'background' color from the theme
