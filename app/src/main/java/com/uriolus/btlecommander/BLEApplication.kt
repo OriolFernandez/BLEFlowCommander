@@ -1,7 +1,8 @@
 package com.uriolus.btlecommander
 
 import android.app.Application
-import com.uriolus.btlecommander.di.featureModule
+import com.uriolus.btlecommander.features.detail.di.featureDetailModule
+import com.uriolus.btlecommander.features.scanneddevices.di.featureDevicesModule
 import com.uriolus.btlelib.di.btleLibModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -17,7 +18,7 @@ class BLEApplication : Application() {
             // Reference Android context
             androidContext(this@BLEApplication)
             // Load modules
-            modules(featureModule, btleLibModule)
+            modules(featureDevicesModule, featureDetailModule, btleLibModule)
         }
     }
 }

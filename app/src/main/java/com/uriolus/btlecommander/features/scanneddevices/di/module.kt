@@ -1,13 +1,13 @@
-package com.uriolus.btlecommander.di
+package com.uriolus.btlecommander.features.scanneddevices.di
 
-import com.uriolus.btlecommander.MainViewModel
+import com.uriolus.btlecommander.features.scanneddevices.DevicesListViewModel
 import com.uriolus.btlecommander.domain.usecase.*
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
-val featureModule = module {
+val featureDevicesModule = module {
     viewModel {
-        MainViewModel(
+        DevicesListViewModel(
             ConnectToScanBLEUseCase(get()),
             StartScanBLEUseCase(get()),
             StopScanBLEUseCase(get()),

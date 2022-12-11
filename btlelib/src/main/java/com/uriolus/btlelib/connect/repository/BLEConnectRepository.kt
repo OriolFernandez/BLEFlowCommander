@@ -6,4 +6,5 @@ import com.uriolus.btlelib.connect.domain.ConnectBLEDeviceError
 
 interface BLEConnectRepository {
     suspend fun connect(device: BLEDevice): Either<ConnectBLEDeviceError, Unit>
+    suspend fun connectByMac(mac: String): Either<ConnectBLEDeviceError, Unit>
 }

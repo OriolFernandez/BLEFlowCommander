@@ -1,6 +1,6 @@
-package com.uriolus.btlecommander.scanneddevices.mapper
+package com.uriolus.btlecommander.features.scanneddevices.mapper
 
-import com.uriolus.btlecommander.scanneddevices.BLEDevicePresentation
+import com.uriolus.btlecommander.features.scanneddevices.models.BLEDevicePresentation
 import com.uriolus.btlelib.common.domain.BLEDevice
 
 object Mapper {

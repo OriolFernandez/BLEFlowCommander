@@ -20,4 +20,10 @@ class BLEConnectRepositoryData(
             .flatMap { bluetoothDevice: BluetoothDevice -> dataSource.connect(bluetoothDevice) }
             .flatMap { Unit.right() }
     }
+    override suspend fun connectByMac(mac: String): Either<ConnectBLEDeviceError, Unit> {
+        return bleDevicesCache.getBluetoothDevice(mac)
+            .mapLeft { ConnectBLEDeviceError.DeviceNotFound(mac) }
+            .flatMap { bluetoothDevice: BluetoothDevice -> dataSource.connect(bluetoothDevice) }
+            .flatMap { Unit.right() }
+    }
 }

@@ -1,4 +1,4 @@
-package com.uriolus.btlecommander.detail.ui
+package com.uriolus.btlecommander.features.detail.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.uriolus.btlecommander.scanneddevices.BLEDevicePresentation
+import com.uriolus.btlecommander.features.scanneddevices.models.BLEDevicePresentation
 
 @Composable
 fun DetailDevice(device: BLEDevicePresentation) {
