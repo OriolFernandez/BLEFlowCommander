@@ -18,7 +18,7 @@ import com.uriolus.btlecommander.features.scanneddevices.NavigationState
 import com.uriolus.btlecommander.features.scanneddevices.PresentationScanState
 import com.uriolus.btlecommander.features.scanneddevices.mapper.Mapper.toPresentation
 import com.uriolus.btlecommander.features.scanneddevices.models.BLEDevicePresentation
-import com.uriolus.btlecommander.scanneddevices.DevicesList
+import com.uriolus.btlecommander.features.scanneddevices.ui.DevicesList
 import com.uriolus.btlecommander.ui.theme.BTLECommanderTheme
 
 @Composable
@@ -75,6 +75,7 @@ fun UIForScanning(
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primary) {
         Column(Modifier.padding(20.dp)) {
+            Loading()
             Text(text = "Scanning")
             Button(onClick = {
                 onStop()

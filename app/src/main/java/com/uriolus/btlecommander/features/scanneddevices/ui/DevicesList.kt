@@ -1,4 +1,4 @@
-package com.uriolus.btlecommander.scanneddevices
+package com.uriolus.btlecommander.features.scanneddevices.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
