@@ -1,4 +1,4 @@
-package com.uriolus.btlecommander
+package com.uriolus.btlecommander.features.scanneddevices
 
 import DevicesListScreen
 import android.content.Intent

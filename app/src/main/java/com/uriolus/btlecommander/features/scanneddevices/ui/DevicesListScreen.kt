@@ -6,6 +6,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -31,7 +32,7 @@ fun DevicesListScreen(
 ) {
 
     val scanStatus: PresentationScanState by remember(viewModel)
-    { viewModel.scanStatus }.collectAsStateWithLifecycle(minActiveState = Lifecycle.State.STARTED)
+    { viewModel.scanStatus }.collectAsStateWithLifecycle()
     val navigationStatus: NavigationState by remember(viewModel) { viewModel.navigationStatus }.collectAsStateWithLifecycle()
 
     BTLECommanderTheme {
