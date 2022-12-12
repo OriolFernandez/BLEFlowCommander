@@ -6,13 +6,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.uriolus.btlecommander.features.scanneddevices.DevicesListViewModel
 import com.uriolus.btlecommander.features.scanneddevices.NavigationState
 import com.uriolus.btlecommander.features.scanneddevices.PresentationScanState
@@ -21,19 +23,22 @@ import com.uriolus.btlecommander.features.scanneddevices.models.BLEDevicePresent
 import com.uriolus.btlecommander.features.scanneddevices.ui.DevicesList
 import com.uriolus.btlecommander.ui.theme.BTLECommanderTheme
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun DevicesListScreen(
     viewModel: DevicesListViewModel,
     onDeviceSelected: (String) -> Unit
 ) {
 
-    val scanStatus: PresentationScanState by remember(viewModel) { viewModel.scanStatus }.collectAsState()
-    val navigationStatus: NavigationState by remember(viewModel) { viewModel.navigationStatus }.collectAsState()
+    val scanStatus: PresentationScanState by remember(viewModel)
+    { viewModel.scanStatus }.collectAsStateWithLifecycle(minActiveState = Lifecycle.State.STARTED)
+    val navigationStatus: NavigationState by remember(viewModel) { viewModel.navigationStatus }.collectAsStateWithLifecycle()
 
     BTLECommanderTheme {
+        println("State in list: $scanStatus")
         // A surface container using the 'background' color from the theme
         when (val status = scanStatus) {
-            is PresentationScanState.Idle -> UiForScannedStatus() { viewModel.startScan() }
+            is PresentationScanState.Idle -> UIForIdle() { viewModel.startScan() }
             is PresentationScanState.Scanned -> UIForScannedResults(status.devices.map { it.toPresentation() }) {
                 viewModel.onDeviceClick(it)
             }
@@ -75,7 +80,7 @@ fun UIForScanning(
 ) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primary) {
         Column(Modifier.padding(20.dp)) {
-            Loading()
+            UiForLoading()
             Text(text = "Scanning")
             Button(onClick = {
                 onStop()

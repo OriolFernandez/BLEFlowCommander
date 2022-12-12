@@ -14,7 +14,12 @@
         android:theme="@style/Theme.BTLECommander"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".features.detail.DetailActivity"
+            android:exported="false"
+            android:label="@string/title_activity_detail"
+            android:theme="@style/Theme.BTLECommander.NoActionBar" />
+        <activity
+            android:name=".ListActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.BTLECommander">

@@ -2,15 +2,15 @@ package com.uriolus.btlecommander.features.scanneddevices
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.uriolus.btlecommander.domain.usecase.*
+import com.uriolus.btlecommander.domain.usecase.ConnectToScanBLEUseCase
+import com.uriolus.btlecommander.domain.usecase.RegisterToBluetoothStateUseCase
+import com.uriolus.btlecommander.domain.usecase.StartScanBLEUseCase
+import com.uriolus.btlecommander.domain.usecase.StopScanBLEUseCase
 import com.uriolus.btlecommander.features.scanneddevices.models.BLEDevicePresentation
 import com.uriolus.btlelib.common.domain.BLEDevice
 import com.uriolus.btlelib.scan.domain.ScanStatus
 import com.uriolus.btlelib.statemonitor.domain.BluetoothState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 
@@ -19,15 +19,12 @@ class DevicesListViewModel(
     private val startScanBLEUseCase: StartScanBLEUseCase,
     private val stopScanBLEUseCase: StopScanBLEUseCase,
     private val registerToBluetoothStateUseCase: RegisterToBluetoothStateUseCase,
-    private val unregisterToBluetoothStateUseCase: UnregisterToBluetoothStateUseCase,
-    private val connectToBLEDeviceUseCase: ConnectToBLEDeviceUseCase
 ) : ViewModel() {
     private val _scanStatus = MutableStateFlow<PresentationScanState>(PresentationScanState.Idle)
-    val scanStatus: StateFlow<PresentationScanState>
-        get() = _scanStatus
+    val scanStatus: StateFlow<PresentationScanState> = _scanStatus.asStateFlow()
 
     private val _navigationStatus = MutableStateFlow<NavigationState>(NavigationState.List)
-    val navigationStatus = _navigationStatus.asStateFlow()
+    val navigationStatus: StateFlow<NavigationState> = _navigationStatus.asStateFlow()
 
     init {
         subscribeToScan()
@@ -54,20 +51,25 @@ class DevicesListViewModel(
                     println("NEW DEVICES!!!!!!!!!: $devicesFound")
                 }
                 .collect {
-                    println("NEW STATE $it")
-                    when (it) {
+                    println("State in Devices NEW STATE $it")
+                    when (val scanStatus = it) {
                         is ScanStatus.ScanningDeviceFound -> {
                             devicesFound.clear()
-                            devicesFound.addAll(it.devices)
-                            _scanStatus.value =
-                                PresentationScanState.ScanningDeviceFound(it.devices)
+                            devicesFound.addAll(scanStatus.devices)
+                            _scanStatus.update {
+                                PresentationScanState.ScanningDeviceFound(scanStatus.devices)
+                            }
                         }
-                        is ScanStatus.Error -> _scanStatus.value = PresentationScanState.Error(it)
-                        is ScanStatus.ScanFinished -> _scanStatus.value =
-                            PresentationScanState.Scanned(devicesFound)
-                        is ScanStatus.Stopped -> _scanStatus.value = PresentationScanState.Idle
-                        ScanStatus.ScanningStarted -> _scanStatus.value =
+                        is ScanStatus.Error -> _scanStatus.update {
+                            PresentationScanState.Error(scanStatus)
+                        }
+                        is ScanStatus.ScanFinished -> {
+                            _scanStatus.update { PresentationScanState.Scanned(devicesFound) }
+                        }
+                        is ScanStatus.Stopped -> _scanStatus.update { PresentationScanState.Idle }
+                        ScanStatus.ScanningStarted -> _scanStatus.update {
                             PresentationScanState.Scanning
+                        }
                     }
                 }
         }

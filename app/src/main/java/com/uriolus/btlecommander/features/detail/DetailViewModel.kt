@@ -7,6 +7,7 @@ import com.uriolus.btlecommander.features.scanneddevices.models.BLEDevicePresent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DetailViewModel(
@@ -15,18 +16,26 @@ class DetailViewModel(
     private val _state: MutableStateFlow<DetailState> = MutableStateFlow(DetailState.Idle)
     val state: StateFlow<DetailState> = _state.asStateFlow()
 
+    init {
+        println("State in detail viewmodel created")
+    }
+
     fun connectDevice(mac: String) {
-        println("Connecting to device $mac")
+        println("State in detail Connecting to device $mac")
         _state.value = DetailState.Loading
         viewModelScope.launch {
-            connectDeviceUseCase.exec(mac)
-                .fold({
-                    _state.value = DetailState.Error(it.toString())
-                }, {
-                    _state.value = DetailState.Loaded(BLEDevicePresentation("test", "test", 1))
-                    println("Detail connected")
-                })
+            connectToMac(mac)
         }
+    }
+
+    private suspend fun connectToMac(mac: String) {
+        connectDeviceUseCase.exec(mac)
+            .fold({
+                _state.update { DetailState.Error(it.toString()) }
+            }, {
+                _state.update { DetailState.Loaded(BLEDevicePresentation("test", "test", 1)) }
+                println("Detail connected")
+            })
     }
 }
 

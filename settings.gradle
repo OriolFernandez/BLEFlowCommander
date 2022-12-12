@@ -16,3 +16,4 @@ rootProject.name = "BTLECommander"
 include ':app'
 include ':btlelib'
 include ':permissions'
+include ':app_normal'

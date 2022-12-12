@@ -35,6 +35,7 @@ android {
     }
     buildFeatures {
         compose true
+        viewBinding true
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.1.1'
@@ -53,6 +54,7 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.6.1'
     implementation "androidx.compose.ui:ui:$compose_ui_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$compose_viewmodel_and_runtime"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha03"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
     implementation "androidx.compose.material:material:$compose_ui_version"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'

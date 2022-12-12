@@ -1,13 +1,16 @@
 package com.uriolus.btlecommander
 
+import DevicesListScreen
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import com.uriolus.btlecommander.navigation.AppNavigation
+import com.uriolus.btlecommander.features.detail.DetailActivity
+import org.koin.androidx.compose.koinViewModel
 
-class MainActivity : ComponentActivity() {
+class ListActivity : ComponentActivity() {
     private val permissionsNeeded = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         arrayOf(
             android.Manifest.permission.BLUETOOTH_CONNECT,
@@ -39,7 +42,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         checkPermissions()
         setContent {
-            AppNavigation()
+            DevicesListScreen(koinViewModel()) { mac ->
+                val intent = Intent(this, DetailActivity::class.java)
+                intent.putExtra(DetailActivity.MAC_PARAMETER, mac)
+                startActivity(intent)
+            }
         }
     }
 
