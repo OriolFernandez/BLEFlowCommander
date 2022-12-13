@@ -1,6 +1,6 @@
 package com.uriolus.btlelib.scan.domain
 
-import com.uriolus.btlelib.common.domain.BLEDevice
+import com.uriolus.btlelib.common.domain.model.BLEDevice
 
 sealed class ScanStatus {
     object Stopped : ScanStatus()

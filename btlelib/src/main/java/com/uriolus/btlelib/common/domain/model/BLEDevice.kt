@@ -1,4 +1,4 @@
-package com.uriolus.btlelib.common.domain
+package com.uriolus.btlelib.common.domain.model
 
 data class BLEDevice(val name: String, val mac: String, val rssi: Int) {
     override fun equals(other: Any?): Boolean {

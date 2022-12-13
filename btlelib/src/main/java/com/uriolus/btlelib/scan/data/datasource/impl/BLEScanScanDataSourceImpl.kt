@@ -12,7 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.uriolus.btlelib.common.BLEDevicesCache
-import com.uriolus.btlelib.common.domain.BLEDevice
+import com.uriolus.btlelib.common.domain.model.BLEDevice
 import com.uriolus.btlelib.scan.data.datasource.BLEScanDataSource
 import com.uriolus.btlelib.scan.data.datasource.mapping.toBLEDevice
 import com.uriolus.btlelib.scan.domain.ScanError

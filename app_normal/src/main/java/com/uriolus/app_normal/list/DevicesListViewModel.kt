@@ -7,7 +7,7 @@ import com.uriolus.app_normal.list.domain.usecase.RegisterToBluetoothStateUseCas
 import com.uriolus.app_normal.list.domain.usecase.StartScanBLEUseCase
 import com.uriolus.app_normal.list.domain.usecase.StopScanBLEUseCase
 import com.uriolus.app_normal.list.models.BLEDevicePresentation
-import com.uriolus.btlelib.common.domain.BLEDevice
+import com.uriolus.btlelib.common.domain.model.BLEDevice
 import com.uriolus.btlelib.scan.domain.ScanStatus
 import com.uriolus.btlelib.statemonitor.domain.BluetoothState
 import kotlinx.coroutines.flow.*

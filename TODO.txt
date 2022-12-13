@@ -1,0 +1,3 @@
+In Ble library,
+GatDevice has the callback and the actions, but no que mechanism
+We should implement queue mechanism and connect the app client with the GattDevice.

@@ -5,7 +5,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import arrow.core.right
 import com.uriolus.btlelib.common.BLEDevicesCache
-import com.uriolus.btlelib.common.domain.BLEDevice
+import com.uriolus.btlelib.common.domain.model.BLEDevice
 import com.uriolus.btlelib.connect.data.BLEConnectDataSource
 import com.uriolus.btlelib.connect.domain.ConnectBLEDeviceError
 import com.uriolus.btlelib.connect.repository.BLEConnectRepository
