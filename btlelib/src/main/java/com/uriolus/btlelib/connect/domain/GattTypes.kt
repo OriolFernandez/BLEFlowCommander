@@ -28,3 +28,4 @@ class GattDescriptor internal constructor(internal val bluetoothGattDescriptor: 
     val id: UUID = bluetoothGattDescriptor.uuid
     val permissions = bluetoothGattDescriptor.permissions
 }
+

@@ -17,6 +17,5 @@ class DetailActivity : ComponentActivity() {
         setContent {
             DetailScreen(mac = mac, navigateUp = { finish() })
         }
-
     }
 }

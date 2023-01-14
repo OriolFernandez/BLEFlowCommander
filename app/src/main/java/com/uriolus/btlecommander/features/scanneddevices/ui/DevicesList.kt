@@ -21,7 +21,6 @@ fun DevicesList(
     devices: List<BLEDevicePresentation>,
     onItemClick: (BLEDevicePresentation) -> Unit
 ) {
-    val navController: NavHostController = rememberNavController()
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)

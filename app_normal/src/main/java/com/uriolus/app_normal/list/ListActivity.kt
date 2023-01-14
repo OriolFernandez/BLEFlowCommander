@@ -1,12 +1,47 @@
-package com.uriolus.app_normal.list
+package com.uriolus.app_normal
 
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Build
 import android.os.Bundle
-import com.uriolus.app_normal.R
+import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 
-class ListActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
+    private val permissionsNeeded = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        arrayOf(
+            android.Manifest.permission.BLUETOOTH_CONNECT,
+            android.Manifest.permission.BLUETOOTH_SCAN
+        )
+    } else {
+        arrayOf(
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+        )
+    }
+    private val activityResultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        )
+        { permissions ->
+            // Handle Permission granted/rejected
+            permissions.entries.forEach {
+                //val permissionName = it.key
+                val isGranted = it.value
+                if (isGranted) {
+                    // Permission is granted
+                } else {
+                    // Permission is denied
+                }
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_list)
+        checkPermissions()
+        setContent {
+     
+        }
+    }
+
+    private fun checkPermissions() {
+        activityResultLauncher.launch(permissionsNeeded)
     }
 }

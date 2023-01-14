@@ -6,15 +6,12 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.uriolus.btlecommander.features.scanneddevices.DevicesListViewModel
 import com.uriolus.btlecommander.features.scanneddevices.NavigationState
@@ -24,7 +21,6 @@ import com.uriolus.btlecommander.features.scanneddevices.models.BLEDevicePresent
 import com.uriolus.btlecommander.features.scanneddevices.ui.DevicesList
 import com.uriolus.btlecommander.ui.theme.BTLECommanderTheme
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun DevicesListScreen(
     viewModel: DevicesListViewModel,

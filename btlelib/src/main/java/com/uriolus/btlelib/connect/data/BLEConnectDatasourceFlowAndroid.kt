@@ -1,19 +1,14 @@
 package com.uriolus.btlelib.connect.data
 
-import GattCharacteristic
-import GattDescriptor
 import android.annotation.SuppressLint
 import android.bluetooth.*
-import android.content.Context
-import android.util.Log
-import arrow.core.left
+import arrow.core.Either
 import com.uriolus.btlelib.common.domain.model.LogCustom
 import com.uriolus.btlelib.connect.domain.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.wallbox.bluetooth.external.model.BTMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
 
 class BLEConnectDatasourceFlowAndroid(private val gattDevice: GattDevice) : BLEConnectDataSourceFlow {
     private var bluetoothGatt: BluetoothGatt? = null
@@ -27,17 +22,12 @@ class BLEConnectDatasourceFlowAndroid(private val gattDevice: GattDevice) : BLEC
 
     @SuppressLint("MissingPermission")
     override suspend fun connect(): Flow<ConnectionChanged> {
-
       return  gattDevice.connect()
-
-        /*
-        continuation.invokeOnCancellation {
-            bluetoothGatt?.disconnect()
-        }
-         */
     }
 
-
+    override suspend fun setMode(btMode: BTMode): Either<SetModeError, Unit> {
+        return gattDevice.setMode(btMode)
+    }
 }
 
 fun MutableSharedFlow<LogCustom>.log(level: Int, msg: String) {
