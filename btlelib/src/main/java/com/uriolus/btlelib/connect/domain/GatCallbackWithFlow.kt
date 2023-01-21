@@ -69,6 +69,7 @@ internal class GatCallbackWithFlow(
         flow.tryEmit(descriptorWritten)
     }
 
+    @Deprecated("Use the one with value as parameter")
     override fun onCharacteristicRead(
         gatt: BluetoothGatt,
         characteristic: BluetoothGattCharacteristic,
@@ -79,10 +80,26 @@ internal class GatCallbackWithFlow(
             characteristic.value,
             status
         )
+        logger?.log(Log.INFO, "onCharacteristicRead(Deprecated): $characteristicRead")
+        flow.tryEmit(characteristicRead)
+    }
+
+    override fun onCharacteristicRead(
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        value: ByteArray,
+        status: Int
+    ) {
+        val characteristicRead = CharacteristicRead(
+            GattCharacteristic(characteristic),
+            value,
+            status
+        )
         logger?.log(Log.INFO, "onCharacteristicRead: $characteristicRead")
         flow.tryEmit(characteristicRead)
     }
 
+    @Deprecated("use the one with value as parameter")
     override fun onCharacteristicChanged(
         gatt: BluetoothGatt,
         characteristic: BluetoothGattCharacteristic
@@ -91,10 +108,24 @@ internal class GatCallbackWithFlow(
             GattCharacteristic(characteristic),
             characteristic.value
         )
+        logger?.log(Log.INFO, "onCharacteristicChanged(Deprecated): $characteristicChanged")
+        flow.tryEmit(characteristicChanged)
+    }
+
+    override fun onCharacteristicChanged(
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        value: ByteArray
+    ) {
+        val characteristicChanged = CharacteristicChanged(
+            GattCharacteristic(characteristic),
+            value
+        )
         logger?.log(Log.INFO, "onCharacteristicChanged: $characteristicChanged")
         flow.tryEmit(characteristicChanged)
     }
 
+    @Deprecated("Use the alternative with value as a parameter")
     override fun onDescriptorRead(
         gatt: BluetoothGatt,
         descriptor: BluetoothGattDescriptor,
@@ -104,6 +135,22 @@ internal class GatCallbackWithFlow(
             GattCharacteristic(descriptor.characteristic),
             GattDescriptor(descriptor),
             descriptor.value,
+            status
+        )
+        logger?.log(Log.INFO, "onDescriptorRead(deprecated): $descriptorRead")
+        flow.tryEmit(descriptorRead)
+    }
+
+    override fun onDescriptorRead(
+        gatt: BluetoothGatt,
+        descriptor: BluetoothGattDescriptor,
+        status: Int,
+        value: ByteArray
+    ) {
+        val descriptorRead = DescriptorRead(
+            GattCharacteristic(descriptor.characteristic),
+            GattDescriptor(descriptor),
+            value,
             status
         )
         logger?.log(Log.INFO, "onDescriptorRead: $descriptorRead")
